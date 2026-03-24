@@ -26,7 +26,7 @@ export default function SyncStatus() {
 
   return (
     <MotionConfig transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
-      <div className="flex items-center gap-2 h-11">
+      <motion.div layout className="flex items-center gap-2 h-11">
         <motion.div
           layout
           className={`flex items-center justify-center h-full px-4 rounded-full overflow-hidden relative ${
@@ -37,9 +37,9 @@ export default function SyncStatus() {
             {status === 'syncing' ? (
               <motion.div
                 key="syncing"
-                initial={{ opacity: 0, y: -15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
                 className="flex items-center gap-2 text-gray-900"
               >
                 <DottedSpinner />
@@ -48,9 +48,9 @@ export default function SyncStatus() {
             ) : (
               <motion.div
                 key="failed"
-                initial={{ opacity: 0, y: -15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
                 className="flex items-center gap-2 text-red-600"
               >
                 <AlertIcon />
@@ -63,6 +63,7 @@ export default function SyncStatus() {
         <AnimatePresence>
           {status === 'failed' && (
             <motion.button
+              layout
               initial={{ opacity: 0, scale: 0.5, filter: 'blur(4px)' }}
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               exit={{ opacity: 0, scale: 0.5, filter: 'blur(4px)' }}
@@ -73,7 +74,7 @@ export default function SyncStatus() {
             </motion.button>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     </MotionConfig>
   );
 }

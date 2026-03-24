@@ -17,6 +17,8 @@ import InvitesWidget from "./InvitesWidget";
 import SyncStatus from "./SyncStatus";
 import CopyCode from "./CopyCode";
 import LoadingProgress from "./LoadingProgress";
+import DeleteButton from "./DeleteButton";
+import SettingsSheet from "./SettingsSheet";
 
 export default function App() {
   return (
@@ -39,6 +41,14 @@ export default function App() {
 
       <div className="w-full flex justify-center py-8">
         <LoadingProgress />
+      </div>
+
+      <div className="w-full flex justify-center py-8">
+        <DeleteButton />
+      </div>
+
+      <div className="w-full flex justify-center py-8">
+        <SettingsSheet />
       </div>
 
       <div className="w-full flex justify-center py-8">

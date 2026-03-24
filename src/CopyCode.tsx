@@ -22,9 +22,9 @@ export default function CopyCode() {
           {!copied ? (
             <motion.div
               key="code"
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
               className="flex items-center gap-4 pl-4 pr-0 h-full"
             >
               <span className="text-gray-500 font-mono text-[15px] font-semibold tracking-wider">
@@ -40,9 +40,9 @@ export default function CopyCode() {
           ) : (
             <motion.div
               key="copied"
-              initial={{ opacity: 0, y: -15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
               className="flex items-center gap-2 px-5 h-full"
             >
               <div className="bg-black text-white rounded-full p-0.5 flex items-center justify-center">
