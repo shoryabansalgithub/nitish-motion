@@ -1,80 +1,174 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, MotionConfig } from 'motion/react';
-import { RefreshCw } from 'lucide-react';
+import { CircleDashed, RotateCw, AlertOctagon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const DottedSpinner = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" className="animate-spin text-gray-900">
-    <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="4 6" strokeLinecap="round" />
-  </svg>
-);
+interface InlineFeedbackProps {
+  errorMessage?: string;
+  loadingMessage?: string;
+  onRetry?: () => void;
+}
 
-const AlertIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-red-600">
-    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-  </svg>
-);
+export default function SyncStatus({
+  errorMessage = 'Sync Failed',
+  loadingMessage = 'Syncing',
+  onRetry,
+}: InlineFeedbackProps = {}) {
+  const [status, setStatus] = useState<'error' | 'loading'>('error');
 
-export default function SyncStatus() {
-  const [status, setStatus] = useState<'syncing' | 'failed'>('syncing');
+  const handleRetry = () => {
+    setStatus('loading');
+    onRetry?.();
+  };
 
   useEffect(() => {
-    if (status === 'syncing') {
-      const timer = setTimeout(() => setStatus('failed'), 3000);
+    if (status === 'loading') {
+      const timer = setTimeout(() => {
+        setStatus('error');
+      }, 3500);
       return () => clearTimeout(timer);
     }
   }, [status]);
 
   return (
-    <MotionConfig transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
-      <motion.div layout className="flex items-center gap-2 h-11">
-        <motion.div
-          layout
-          className={`flex items-center justify-center h-full px-4 rounded-full overflow-hidden relative ${
-            status === 'syncing' ? 'bg-[#f4f4f5]' : 'bg-red-50'
-          }`}
+    <div className="flex min-h-full items-center justify-center bg-transparent p-4 dark:bg-neutral-950">
+      <div className="flex h-14 items-center gap-3">
+        <MotionConfig
+          transition={{ type: 'spring', bounce: 0.25, duration: 0.6 }}
         >
-          <AnimatePresence mode="popLayout" initial={false}>
-            {status === 'syncing' ? (
-              <motion.div
-                key="syncing"
-                initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-                className="flex items-center gap-2 text-gray-900"
+          <motion.div
+            animate={{ width: 'auto' }}
+            layout
+            initial={false}
+            className={cn(
+              'relative z-20 flex items-center justify-center overflow-hidden border px-6 py-4',
+              status === 'error'
+                ? 'border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900'
+                : 'border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900',
+            )}
+            style={{
+              borderRadius: 32,
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, filter: 'blur(8px)' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+              className="flex items-center gap-2"
+            >
+              <AnimatePresence mode="popLayout">
+                <motion.div
+                  layout
+                  key={status}
+                  initial={{ opacity: 0, scale: 0.25, filter: 'blur(2px)' }}
+                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                  exit={{ opacity: 0, scale: 0.25, filter: 'blur(2px)' }}
+                  transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
+                >
+                  {status === 'error' ? (
+                    <AlertOctagon
+                      size={26}
+                      className={cn('text-red-500 dark:text-red-500')}
+                    />
+                  ) : (
+                    <CircleDashed
+                      size={26}
+                      strokeWidth={2.8}
+                      className={cn(
+                        'animate-spin text-neutral-700 dark:text-neutral-200',
+                      )}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              <AnimatedText
+                text={status === 'error' ? errorMessage : loadingMessage}
+                className={cn(
+                  'text-xl font-semibold',
+                  status === 'error'
+                    ? 'text-red-500'
+                    : 'text-neutral-700 dark:text-neutral-200',
+                )}
+              />
+            </motion.div>
+          </motion.div>
+
+          <AnimatePresence mode="popLayout">
+            {status === 'error' && (
+              <motion.button
+                initial={{
+                  opacity: 0,
+                  x: -55,
+                  filter: 'blur(4px)',
+                  scale: 0.8,
+                }}
+                animate={{ opacity: 1, x: 0, filter: 'blur(0px)', scale: 1 }}
+                exit={{ opacity: 1, x: -55, filter: 'blur(4px)', scale: 0.8 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+                whileHover={{ scale: 1.06 }}
+                whileTap={{ scale: 0.94 }}
+                onClick={handleRetry}
+                className={cn(
+                  'z-10 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black',
+                )}
               >
-                <DottedSpinner />
-                <span className="font-medium text-[15px]">Syncing</span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="failed"
-                initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-                className="flex items-center gap-2 text-red-600"
-              >
-                <AlertIcon />
-                <span className="font-medium text-[15px]">Sync Failed</span>
-              </motion.div>
+                <RotateCw size={22} />
+              </motion.button>
             )}
           </AnimatePresence>
-        </motion.div>
+        </MotionConfig>
+      </div>
+    </div>
+  );
+}
 
-        <AnimatePresence>
-          {status === 'failed' && (
-            <motion.button
-              layout
-              initial={{ opacity: 0, scale: 0.5, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, scale: 0.5, filter: 'blur(4px)' }}
-              onClick={() => setStatus('syncing')}
-              className="w-11 h-11 bg-[#18181b] text-white rounded-full flex items-center justify-center hover:bg-[#27272a] transition-colors shadow-sm shrink-0"
+function AnimatedText({
+  text,
+  className,
+  delayStep = 0.014,
+}: {
+  text: string;
+  className?: string;
+  delayStep?: number;
+}) {
+  const chars = text.split('');
+
+  return (
+    <span style={{ display: 'inline-flex' }}>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          layout
+          key={text}
+          style={{ display: 'inline-flex', willChange: 'transform' }}
+        >
+          {chars.map((char, i) => (
+            <motion.span
+              key={i}
+              initial={{ y: 10, opacity: 0, scale: 0.5, filter: 'blur(2px)' }}
+              animate={{ y: 0, opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ y: -10, opacity: 0, scale: 0.5, filter: 'blur(2px)' }}
+              transition={{
+                type: 'spring',
+                stiffness: 240,
+                damping: 16,
+                mass: 1.2,
+                delay: i * delayStep,
+              }}
+              style={{
+                display: 'inline-block',
+                whiteSpace: char === ' ' ? 'pre' : undefined,
+              }}
+              className={className}
             >
-              <RefreshCw className="w-5 h-5" />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </MotionConfig>
+              {char}
+            </motion.span>
+          ))}
+        </motion.span>
+      </AnimatePresence>
+    </span>
   );
 }

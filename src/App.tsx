@@ -19,73 +19,54 @@ import CopyCode from "./CopyCode";
 import LoadingProgress from "./LoadingProgress";
 import DeleteButton from "./DeleteButton";
 import SettingsSheet from "./SettingsSheet";
+import OptionPicker from "./OptionPicker";
+import EventReminders from "./EventReminders";
+import EmojiSpreeChips from "./EmojiSpreeChips";
+import AiPromptAction from "./AiPromptAction";
+
+import DeployStatusPill from "./DeployStatusPill";
+import FilterBar from "./FilterBar";
+
+const MOCK_INTERESTS = [
+  { id: '1', label: 'Photography', emoji: '📸' },
+  { id: '2', label: 'Design', emoji: '🎨' },
+  { id: '3', label: 'Coding', emoji: '💻' },
+  { id: '4', label: 'Music', emoji: '🎵' },
+  { id: '5', label: 'Travel', emoji: '✈️' },
+  { id: '6', label: 'Coffee', emoji: '☕' },
+  { id: '7', label: 'Reading', emoji: '📚' },
+  { id: '8', label: 'Gaming', emoji: '🎮' },
+  { id: '9', label: 'Fitness', emoji: '🏋️' },
+  { id: '10', label: 'Cooking', emoji: '🍳' },
+  { id: '11', label: 'Movies', emoji: '🍿' },
+  { id: '12', label: 'Nature', emoji: '🌲' },
+];
 
 export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-20 gap-16">
-      <div className="w-full flex justify-center py-8">
-        <ConfigurationPanel />
-      </div>
-
-      <div className="w-full flex justify-center h-[350px] items-end pb-4">
-        <FloatingMenu />
-      </div>
-
-      <div className="w-full flex justify-center h-[120px]">
-        <FrequencySelector />
-      </div>
-
-      <div className="w-full flex justify-center">
-        <DiscreteTabs />
-      </div>
-
-      <div className="w-[480px] h-[80px] flex justify-center">
-        <DiscoverButton />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <NestedMenu />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <SidebarMenu />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <SyncButton />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <ProjectSelector />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <SettingsSheet />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <DeleteButton />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <LoadingProgress />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <CopyCode />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <SyncStatus />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <InvitesWidget />
-      </div>
-
-      <div className="w-full flex justify-center py-8">
-        <AiToolbar />
-      </div>
+      <DiscoverButton />
+      <DiscreteTabs />
+      <FrequencySelector />
+      <FloatingMenu />
+      <ConfigurationPanel />
+      <NestedMenu />
+      <SidebarMenu />
+      <ProjectSelector />
+      <SyncButton />
+      <AiToolbar />
+      <InvitesWidget />
+      <SyncStatus />
+      <CopyCode />
+      <LoadingProgress />
+      <DeleteButton />
+      <SettingsSheet />
+      <OptionPicker />
+      <EventReminders />
+      <EmojiSpreeChips interests={MOCK_INTERESTS} />
+      <AiPromptAction />
+      <DeployStatusPill />
+      <FilterBar />
     </div>
   );
 }

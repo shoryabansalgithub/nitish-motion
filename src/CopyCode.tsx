@@ -1,60 +1,111 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence, MotionConfig } from 'motion/react';
-import { Check } from 'lucide-react';
+'use client';
 
-export default function CopyCode() {
-  const [copied, setCopied] = useState(false);
+import { useState, type FC } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { IoCheckmarkCircle } from 'react-icons/io5';
 
-  useEffect(() => {
-    if (copied) {
-      const timer = setTimeout(() => setCopied(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [copied]);
+export interface InlineCopyToastProps {
+  code?: string;
+  copyDuration?: number;
+}
+
+export default function CopyCode({
+  code = 'npm install motion',
+  copyDuration = 2000,
+}: InlineCopyToastProps = {}) {
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const handleCopy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+
+    setTimeout(() => {
+      setCopied(false);
+    }, copyDuration);
+  };
 
   return (
-    <MotionConfig transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
+    <div className="flex flex-col items-center justify-center gap-8 bg-transparent transition-colors duration-500 dark:bg-zinc-950">
       <motion.div
-        layout
-        className="bg-[#f4f4f5] rounded-full p-1.5 flex items-center overflow-hidden shadow-sm h-12"
+        layout="position"
+        transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+        className="relative flex h-16 min-w-[320px] items-center justify-center overflow-hidden rounded-full border border-[#ecebeb2b] bg-[#F6F6F6] pr-4 pl-7 shadow-sm dark:bg-zinc-900"
       >
-        <AnimatePresence mode="popLayout" initial={false}>
-          {!copied ? (
+        <AnimatePresence>
+          {copied && (
             <motion.div
-              key="code"
-              initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-              className="flex items-center gap-4 pl-4 pr-0 h-full"
-            >
-              <span className="text-gray-500 font-mono text-[15px] font-semibold tracking-wider">
-                B3E45S7T
-              </span>
-              <button
-                onClick={() => setCopied(true)}
-                className="bg-white text-gray-900 px-5 h-full rounded-full text-[15px] font-medium shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                Copy
-              </button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="copied"
-              initial={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
-              className="flex items-center gap-2 px-5 h-full"
-            >
-              <div className="bg-black text-white rounded-full p-0.5 flex items-center justify-center">
-                <Check className="w-3 h-3" strokeWidth={3} />
-              </div>
-              <span className="text-gray-900 font-medium text-[15px]">
-                Code Copied!
-              </span>
-            </motion.div>
+              initial={{ x: '-100%' }}
+              animate={{ x: '0%' }}
+              transition={{
+                duration: copyDuration / 1000,
+                ease: 'linear',
+              }}
+              className="absolute inset-0 bg-[#F0F0F0] dark:bg-zinc-800"
+            />
           )}
         </AnimatePresence>
+
+        <div className=" z-10 flex w-full items-center justify-between gap-7">
+          <AnimatePresence mode="popLayout" >
+            {!copied ? (
+              <motion.div
+                key="copy"
+                initial={{ opacity: 0, filter: 'blur(4px)', scale: 0.95 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                exit={{ opacity: 0, filter: 'blur(4px)', scale: 0.95 }}
+                transition={{
+                  type: 'spring',
+                  bounce: 0,
+                  duration: 0.4
+                }}
+                className="flex w-full items-center justify-between"
+              >
+                <span className="text-xl font-bold tracking-wide text-[#868686] dark:text-zinc-500">
+                  {code}
+                </span>
+
+                <motion.button
+                  onClick={handleCopy}
+                  whileHover={{ y: -1, scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 350,
+                    damping: 18,
+                  }}
+                  className="relative cursor-pointer overflow-hidden rounded-full bg-[#FEFEFE] px-[26px] py-2.5 text-base font-semibold text-black shadow-[0_6px_12px_rgba(0,0,0,0.08)] dark:bg-zinc-100"
+                >
+                  <motion.span
+                    initial={{ x: '-120%' }}
+                    whileHover={{ x: '120%' }}
+                    transition={{ duration: 0.6, ease: 'easeInOut' }}
+                    className="pointer-events-none absolute inset-0 bg-linear-to-r from-transparent via-black/5 to-transparent"
+                  />
+
+                  <span className="relative z-10">Copy</span>
+                </motion.button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="copied"
+                initial={{ opacity: 0, filter: 'blur(4px)', scale: 1.1 }}
+                animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+                exit={{ opacity: 0, filter: 'blur(4px)', scale: 1.1 }}
+                transition={{
+                  type: 'spring',
+                  bounce: 0,
+                  duration: 0.4
+
+                }}
+                className="flex w-full items-center justify-center gap-2 text-black dark:text-white"
+              >
+                <IoCheckmarkCircle size={28} />
+                <span className="text-lg font-bold">Code Copied!</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
-    </MotionConfig>
+    </div>
   );
 }

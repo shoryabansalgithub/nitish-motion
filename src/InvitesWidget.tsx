@@ -1,111 +1,173 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence, MotionConfig } from 'motion/react';
-import { X, Folder, PenTool, Zap, Wrench } from 'lucide-react';
+import React, { useState, type ReactNode } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  MotionConfig,
+  type Transition,
+} from 'motion/react';
+import { X, FolderClosed, Compass, Zap, Wrench } from 'lucide-react';
 
-const invites = [
+export interface InviteItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: ReactNode;
+  hasUpdate?: boolean;
+}
+
+interface InviteDisclosureProps {
+  title?: string;
+  badgeCount?: number;
+  invites?: InviteItem[];
+}
+
+const DEFAULT_INVITES: InviteItem[] = [
   {
-    id: 'sonora',
+    id: '1',
     title: 'Sonora Repository',
     description: 'Contribute to the code repository',
-    icon: Folder,
+    icon: <FolderClosed className="h-4 w-4 text-[#868686]" />,
+    hasUpdate: true,
   },
   {
-    id: 'design',
+    id: '2',
     title: 'Design Tokens',
     description: 'Collaborate on design tokens',
-    icon: PenTool,
+    icon: <Compass className="h-5 w-5 text-[#868686]" />,
+    hasUpdate: true,
   },
   {
-    id: 'motion',
+    id: '3',
     title: 'Motion Kit',
     description: 'Contribute to motion components',
-    icon: Zap,
+    icon: <Zap className="h-5 w-5 text-[#868686]" />,
   },
   {
-    id: 'build',
+    id: '4',
     title: 'Build Tools',
     description: 'Explore build tools & pipeline',
-    icon: Wrench,
+    icon: <Wrench className="h-5 w-5 text-[#868686]" />,
   },
 ];
 
-export default function InvitesWidget() {
+const springTransition: Transition = {
+  type: 'spring',
+  stiffness: 800,
+  damping: 80,
+  mass: 5,
+};
+
+const collapsedTransition: Transition = {
+  type: 'spring',
+  stiffness: 800,
+  damping: 80,
+  mass: 4,
+};
+
+export default function InvitesWidget({
+  title = 'Invites',
+  badgeCount = 2,
+  invites = DEFAULT_INVITES,
+}: InviteDisclosureProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <MotionConfig transition={{ type: 'spring', bounce: 0, duration: 0.4 }}>
-      <div className="relative flex justify-center items-center">
-        <AnimatePresence mode="wait">
+    <div className="flex h-[500px] w-fit items-center justify-center">
+      <MotionConfig transition={isOpen ? springTransition : collapsedTransition}>
+        <AnimatePresence mode="popLayout" initial={false}>
           {!isOpen ? (
             <motion.button
-              key="button"
-              layoutId="invites-container"
+              layoutId="disclosure"
               onClick={() => setIsOpen(true)}
-              className="bg-[#f4f4f5] hover:bg-[#e4e4e7] transition-colors rounded-full px-4 py-2.5 flex items-center gap-3 shadow-sm"
-              whileTap={{ scale: 0.97 }}
+              style={{
+                borderRadius: 32,
+              }}
+              className="flex cursor-pointer items-center gap-3 bg-[#F4F4F4] px-6 py-4 transition-colors duration-200 hover:bg-[#eae8e8] dark:bg-neutral-900 dark:hover:bg-neutral-800"
             >
-              <motion.span layoutId="invites-title" className="font-medium text-gray-900 text-[15px]">
-                Invites
-              </motion.span>
-              <motion.div 
-                layoutId="invites-badge"
-                className="bg-[#27272a] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold"
+              <motion.span
+                layoutId="title"
+                className="text-xl font-semibold text-[#262626] dark:text-neutral-100"
               >
-                2
+                {title}
+              </motion.span>
+              <motion.div
+                layoutId="badge"
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#262626] text-[14px] font-bold text-white dark:bg-neutral-100 dark:text-neutral-900"
+              >
+                {badgeCount}
               </motion.div>
             </motion.button>
           ) : (
             <motion.div
-              key="card"
-              layoutId="invites-container"
-              className="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 w-[340px] overflow-hidden"
+              layoutId="disclosure"
+              className="w-xs bg-[#F4F4F4] p-2 sm:w-[360px] dark:bg-neutral-900"
+              style={{
+                borderRadius: 24,
+              }}
             >
-              <div className="p-5">
-                <div className="flex items-center justify-between mb-4 px-1">
-                  <motion.h2 layoutId="invites-title" className="text-xl font-semibold text-gray-900">
-                    Invites
-                  </motion.h2>
-                  <motion.button
-                    layoutId="invites-badge"
-                    onClick={() => setIsOpen(false)}
-                    className="w-8 h-8 bg-[#f4f4f5] hover:bg-[#e4e4e7] text-gray-600 rounded-full flex items-center justify-center transition-colors"
-                  >
-                    <X size={18} />
-                  </motion.button>
-                </div>
+              <div className="flex items-center justify-between px-6 pt-4 pb-6">
+                <motion.h2
+                  layoutId="title"
+                  className="text-2xl font-bold text-[#262626] dark:text-neutral-100"
+                >
+                  {title}
+                </motion.h2>
+                <motion.button
+                  layoutId="badge"
+                  title="close"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#fefefe] transition-colors duration-200 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700"
+                >
+                  <X className="h-5 w-5 text-[#676767] dark:text-neutral-400" />
+                </motion.button>
+              </div>
 
-                <div className="flex flex-col gap-2">
-                  {invites.map((invite, i) => (
-                    <motion.button
-                      key={invite.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="flex items-center gap-4 p-3 rounded-2xl bg-[#f4f4f5] hover:bg-[#e4e4e7] transition-colors text-left group"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-500 shrink-0 shadow-sm relative">
-                        <invite.icon size={18} />
-                        {i < 2 && (
-                          <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-black rounded-full border-2 border-white" />
-                        )}
+              <div className="space-y-3 px-2 pb-4">
+                {invites.map((invite, index) => (
+                  <motion.div
+                    key={invite.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{
+                      delay: index * 0.04 + 0.1,
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 20,
+                    }}
+                    className="group flex cursor-pointer items-center gap-4 rounded-2xl bg-[#FEFEFE] px-3 py-3 transition-all hover:bg-[#FEFEFE]/70 hover:shadow-sm dark:bg-neutral-800 dark:hover:bg-neutral-800/70"
+                  >
+                    <div className="relative">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-neutral-700">
+                        {invite.icon && React.isValidElement(invite.icon)
+                          ? React.cloneElement(
+                              invite.icon as React.ReactElement<any>,
+                              {
+                                className: `${(invite.icon as React.ReactElement<any>).props.className} dark:text-neutral-300`,
+                              },
+                            )
+                          : invite.icon}
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-[15px] font-semibold text-gray-900 leading-snug">
-                          {invite.title}
-                        </span>
-                        <span className="text-[13px] text-gray-500 leading-snug">
-                          {invite.description}
-                        </span>
-                      </div>
-                    </motion.button>
-                  ))}
-                </div>
+                      {invite.hasUpdate && (
+                        <div className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#262626] dark:border-neutral-800 dark:bg-neutral-100" />
+                      )}
+                    </div>
+
+                    <div className="flex-1">
+                      <h3 className="text-[15px] leading-tight font-bold text-[#262626] dark:text-neutral-100">
+                        {invite.title}
+                      </h3>
+                      <p className="text-sm font-medium text-[#9B9B9B] dark:text-neutral-500">
+                        {invite.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </MotionConfig>
+      </MotionConfig>
+    </div>
   );
 }
